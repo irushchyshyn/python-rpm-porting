@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tools for programming in Python &mdash; Python RPM Porting Guide 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Python RPM Porting Guide 0.1 documentation" href="index.html"/>
+        <link rel="next" title="New Python package naming scheme" href="naming-scheme.html"/>
+        <link rel="prev" title="Porting an application and a module in one package" href="application-modules.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Python RPM Porting Guide
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to the Python RPM Porting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Porting applications that happen to be written in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Porting Python modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application-modules.html">Porting an application and a module in one package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools for programming in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#porting-the-specfile-to-python-3">Porting the specfile to Python 3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modifications">Modifications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-subpackages">Creating subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#python-provide">%python_provide</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#description">%description</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#buildrequires-and-requires">BuildRequires and Requires</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build">%build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install">%install</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#moving-the-executables-and-making-symlinks">Moving the Executables and Making Symlinks</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#check">%check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files">%files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#are-shebangs-dragging-you-down-to-python-2">Are shebangs dragging you down (to Python 2)?</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fixing-shebangs">Fixing shebangs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ported-rpm-spec-file">Ported RPM spec file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#diff-of-the-changes">Diff of the changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="naming-scheme.html">New Python package naming scheme</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Python RPM Porting Guide</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Tools for programming in Python</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tools-for-programming-in-python">
+<h1>Tools for programming in Python<a class="headerlink" href="#tools-for-programming-in-python" title="Permalink to this headline">¶</a></h1>
+<p>This last section is for tools (executables) written in Python that themselves interact with Python code. If you need to package two versions of the executable, one for each major Python version, then this section is for you.</p>
+<p>Examples: <em>pip, pytest, nosetest</em>.</p>
+<p>If this doesn&#8217;t fit your package, look into <a class="reference internal" href="index.html#chosing-type-section"><span class="std std-ref">other sections</span></a>.</p>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#porting-the-specfile-to-python-3" id="id1">Porting the specfile to Python 3</a></li>
+<li><a class="reference internal" href="#modifications" id="id2">Modifications</a><ul>
+<li><a class="reference internal" href="#creating-subpackages" id="id3">Creating subpackages</a><ul>
+<li><a class="reference internal" href="#python-provide" id="id4">%python_provide</a></li>
+<li><a class="reference internal" href="#description" id="id5">%description</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#buildrequires-and-requires" id="id6">BuildRequires and Requires</a></li>
+<li><a class="reference internal" href="#build" id="id7">%build</a></li>
+<li><a class="reference internal" href="#install" id="id8">%install</a><ul>
+<li><a class="reference internal" href="#moving-the-executables-and-making-symlinks" id="id9">Moving the Executables and Making Symlinks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#check" id="id10">%check</a></li>
+<li><a class="reference internal" href="#files" id="id11">%files</a></li>
+<li><a class="reference internal" href="#are-shebangs-dragging-you-down-to-python-2" id="id12">Are shebangs dragging you down (to Python 2)?</a><ul>
+<li><a class="reference internal" href="#fixing-shebangs" id="id13">Fixing shebangs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ported-rpm-spec-file" id="id14">Ported RPM spec file</a></li>
+<li><a class="reference internal" href="#diff-of-the-changes" id="id15">Diff of the changes</a></li>
+</ul>
+</div>
+<div class="section" id="porting-the-specfile-to-python-3">
+<h2><a class="toc-backref" href="#id1">Porting the specfile to Python 3</a><a class="headerlink" href="#porting-the-specfile-to-python-3" title="Permalink to this headline">¶</a></h2>
+<p>Because your package has an executable that interacts with Python code, users will most likely want it to work both with code for Python 2 and code for Python 3, as both are very common today. And even in the future, there will be heaps of legacy Python 2 code that may still be useful.</p>
+<p>When you want to package two different executables, the best practice (put forth by the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Common_SRPM_vs_split_SRPMs">Fedora Packaging Guidelines for Python</a>) is to <strong>split your package into two subpackages.</strong> One subpackage for Python 2 and one for Python 3. That will allow the user to install just one of them instead of having to install the other as well, for which they not have any need.</p>
+<p>Let&#8217;s take an example spec file and port it to illustrate the process. We start with a spec file for a Python tool packaged for Python version 2:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%global srcname example
+
+<span class="gh">Name</span><span class="p">:</span>           python-<span class="kc">%{srcname}</span>
+<span class="gh">Version</span><span class="p">:</span>        1.2.3
+<span class="gh">Release</span><span class="p">:</span>        1<span class="nv">%{?dist}</span>
+<span class="gh">Summary</span><span class="p">:</span>        An example Python tool
+
+<span class="gh">License</span><span class="p">:</span>        MIT
+<span class="gh">URL</span><span class="p">:</span>            http://pypi.python.org/pypi/<span class="kc">%{srcname}</span>
+<span class="gh">Source0</span><span class="p">:</span>        https://files.pythonhosted.org/packages/source/e/<span class="kc">%{srcname}</span>/<span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>.tar.gz
+
+<span class="gh">BuildArch</span><span class="p">:</span>      noarch
+<span class="gh">BuildRequires</span><span class="p">:</span>  python-devel
+<span class="gh">Requires</span><span class="p">:</span> python-some-module
+<span class="gh">Requires</span><span class="p">:</span> python2-other-module
+
+<span class="nd">%description</span>
+A Python tool which provides a convenient example.
+
+
+<span class="nd">%prep</span>
+%autosetup -n <span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>
+
+
+<span class="nd">%build</span>
+<span class="nf">%{__python}</span> setup.py build
+
+
+<span class="nd">%install</span>
+<span class="nf">%{__python}</span> setup.py install --skip-build --root <span class="vg">$RPM_BUILD_ROOT</span>
+
+
+<span class="nd">%check</span>
+<span class="nf">%{__python}</span> setup.py test
+
+
+<span class="nd">%files</span>
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec
+
+
+<span class="nd">%changelog</span>
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="modifications">
+<h2><a class="toc-backref" href="#id2">Modifications</a><a class="headerlink" href="#modifications" title="Permalink to this headline">¶</a></h2>
+<p>First it is recommended to update the software you are packaging to its newest upstream version. If it already is at the latest version, increment the release number. Don&#8217;t forget to add a <code class="docutils literal"><span class="pre">%changelog</span></code> entry as well.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this document you will encounter lot of RPM macros. You can look up many of the Python macros in the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Macros">Python packaging guidelines</a> (click the <strong>Expand button</strong> on the right side).</p>
+</div>
+<div class="section" id="creating-subpackages">
+<h3><a class="toc-backref" href="#id3">Creating subpackages</a><a class="headerlink" href="#creating-subpackages" title="Permalink to this headline">¶</a></h3>
+<p>Each subpackage you create will need to have its own name, summary and description. If you haven&#8217;t already, it is thus advised to declare macros for common values at the top of the specfile:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%global srcname example
+</pre></div>
+</div>
+<p>Now we can use these to create the subpackages. The following should be placed beneath the <code class="docutils literal"><span class="pre">%description</span></code> section of the base package:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%package</span> -n python2-%{srcname}
+<span class="gh">Summary</span><span class="p">:</span>  <span class="kc">%{summary}</span>
+<span class="gh">Requires</span><span class="p">:</span> python-some-module
+<span class="gh">Requires</span><span class="p">:</span> python2-other-module
+%{?python_provide:%python_provide python2-<span class="kc">%{srcname}</span>}
+
+<span class="nd">%description</span> -n python2-%{srcname}
+A Python tool which provides a convenient example.
+
+
+<span class="nd">%package</span> -n python3-%{srcname}
+<span class="gh">Summary</span><span class="p">:</span>  <span class="kc">%{summary}</span>
+<span class="gh">Requires</span><span class="p">:</span> python3-some-module
+<span class="gh">Requires</span><span class="p">:</span> python3-other-module
+%{?python_provide:%python_provide python3-<span class="kc">%{srcname}</span>}
+
+<span class="nd">%description</span> -n python3-%{srcname}
+A Python tool which provides a convenient example.
+</pre></div>
+</div>
+<p>First, using the <code class="docutils literal"><span class="pre">%package</span></code> macro you start defining a new <em>subpackage</em>, specifying its full name as <code class="docutils literal"><span class="pre">python2-%{srcname}</span></code>, which in this case will become <code class="docutils literal"><span class="pre">python2-example</span></code>. Next we provide the summary which we defined earlier.</p>
+<p id="requires-subsection"><code class="docutils literal"><span class="pre">BuildRequires:</span></code> tags from the original spec file will remain where they are—declared in the definition of the base package at the top of the spec file. However, the runtime requirements—the ones listed using the <code class="docutils literal"><span class="pre">Requires:</span></code> tag—will be different for the two subpackages, so they have to be moved here to the definition of each subpackage.</p>
+<p>While you can <em>cut and paste</em> all the <code class="docutils literal"><span class="pre">Requires:</span></code> tags directly from the base package to the <code class="docutils literal"><span class="pre">python2-</span></code> subpackage, remember that for the <code class="docutils literal"><span class="pre">python3-</span></code> subpackage you need to find Python 3 versions of each of the runtime dependencies.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can see that the naming of Python 2 packages isn&#8217;t uniform: some follow the current convention of using the <code class="docutils literal"><span class="pre">python2-</span></code> prefix, older ones use only the <code class="docutils literal"><span class="pre">python-</span></code> prefix, and the oldest might be without a prefix at all.</p>
+<p class="last">In many cases the Python 2 package can be found under both the <code class="docutils literal"><span class="pre">python2-</span></code> and <code class="docutils literal"><span class="pre">python-</span></code> prefixes, one of them being <em>virtually provided</em> by the <code class="docutils literal"><span class="pre">Provides:</span></code> tag. Whenever possible, use the version with the <code class="docutils literal"><span class="pre">python2-</span></code> prefix.</p>
+</div>
+<div class="section" id="python-provide">
+<h4><a class="toc-backref" href="#id4">%python_provide</a><a class="headerlink" href="#python-provide" title="Permalink to this headline">¶</a></h4>
+<p>Now that we&#8217;re splitting the package <code class="docutils literal"><span class="pre">python-example</span></code> into <code class="docutils literal"><span class="pre">python2-example</span></code> and <code class="docutils literal"><span class="pre">python3-example</span></code>, we need to define what will happen when the user tries to install the unversioned name <code class="docutils literal"><span class="pre">python-example</span></code>.</p>
+<p>At the time of this writing, the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Avoiding_collisions_between_the_python_2_and_python_3_stacks">packaging guidelines</a> say that the <em>default</em> version should be the one for Python 2. However, it is expected to change to Python 3 some time in the future. To avoid having to adjust all Python packages in Fedora when that time comes, the <code class="docutils literal"><span class="pre">%python_provide</span></code> macro was devised:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%{?python_provide:%python_provide python2-<span class="kc">%{srcname}</span>}
+and
+%{?python_provide:%python_provide python3-<span class="kc">%{srcname}</span>}
+</pre></div>
+</div>
+<p>This is a line you should include in each of your subpackages and it works thus: First the part <code class="docutils literal"><span class="pre">?python_provide:</span></code> checks whether the macro exists and if not, the entire line is ignored. After that we actually use the <code class="docutils literal"><span class="pre">%python_provide</span></code> macro and give it one argument—the name of the given subpackage.</p>
+<p>The macro will then check whether this Python version is default or not—if not, the line is again ignored. However, if indeed this is the currently default Python version, the macro is replaced with a <em>virtual provides</em> tag: <code class="docutils literal"><span class="pre">Provides:</span> <span class="pre">python-%{srcname}</span></code>. This will tell the packaging system (dnf, yum, ...) to install this subpackage when user searches for <code class="docutils literal"><span class="pre">python-example</span></code>.</p>
+</div>
+<div class="section" id="description">
+<h4><a class="toc-backref" href="#id5">%description</a><a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h4>
+<p>Each subpackage also needs to contain its own description. However, unlike the <code class="docutils literal"><span class="pre">Summary:</span></code> and <code class="docutils literal"><span class="pre">Requires:</span></code> tags, which are automatically applied to the subpackage declared above them, the <code class="docutils literal"><span class="pre">%description</span></code> macro needs to be told to which subpackage it belongs. You can do that by appending the same name as you did with the <code class="docutils literal"><span class="pre">%package</span></code> macro itself.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%description</span> -n python3-%{srcname}
+A Python tool which provides a convenient example.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="buildrequires-and-requires">
+<h3><a class="toc-backref" href="#id6">BuildRequires and Requires</a><a class="headerlink" href="#buildrequires-and-requires" title="Permalink to this headline">¶</a></h3>
+<p>Now that you&#8217;re building subpackages for both Python 2 and Python 3, you need to adjust the <code class="docutils literal"><span class="pre">BuildRequires:</span></code> by adding Python 3 versions of all the existing build dependencies. Starting with <code class="docutils literal"><span class="pre">python-devel</span></code>: Use its new version-specific name <code class="docutils literal"><span class="pre">python2-devel</span></code> and add it&#8217;s Python 3 equivalent <code class="docutils literal"><span class="pre">python3-devel</span></code>.</p>
+<p>As described <a class="reference internal" href="#requires-subsection">above</a>, <code class="docutils literal"><span class="pre">Requires:</span></code> tags are a bit more complicated. You should move the current set of <code class="docutils literal"><span class="pre">Requires:</span></code> underneath the definition of the Python 2 subpackage, and for the Python 3 subpackage, you need to find Python 3 alternatives for all the current Python 2 runtime requirements that are specified with the <code class="docutils literal"><span class="pre">Requires:</span></code> tags.</p>
+</div>
+<div class="section" id="build">
+<h3><a class="toc-backref" href="#id7">%build</a><a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h3>
+<p>Currently your package is building the software for Python 2, what we need to do is also add building for Python 3. While we&#8217;re modifying the spec file, however, it&#8217;s a good idea to also update it to new standards—in this case a new macro.</p>
+<p>In the ideal case, you&#8217;ll find the build done with either the <code class="docutils literal"><span class="pre">%py2_build</span></code> macro or its older version <code class="docutils literal"><span class="pre">%py_build</span></code>, which you then should exchange for the former. In either case, you can just add the macro <code class="docutils literal"><span class="pre">%py3_build</span></code> afterwards, and this part is done. Note that to use these macros, you need to have <code class="docutils literal"><span class="pre">python2-devel</span></code> and/or <code class="docutils literal"><span class="pre">python3-devel</span></code> listed among <code class="docutils literal"><span class="pre">BuildRequires</span></code>, but most Python packages already do.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%build</span>
+%py2_build
+%py3_build
+</pre></div>
+</div>
+<p>In many cases, however, you will find a custom build command prefixed by the <code class="docutils literal"><span class="pre">%{__python}</span></code> or <code class="docutils literal"><span class="pre">%{__python2}</span></code> macros, or in some cases just prefixed by the python interpreter invoked without a macro at all, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="p">{</span><span class="n">__python</span><span class="p">}</span> <span class="n">custombuild</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">many</span><span class="o">-</span><span class="n">flags</span>
+    <span class="ow">or</span>
+<span class="n">python</span> <span class="n">custombuild</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">many</span><span class="o">-</span><span class="n">flags</span>
+</pre></div>
+</div>
+<p>In these cases first try substituting the whole build command by the new pair of smart macros <code class="docutils literal"><span class="pre">%py2_build</span></code> and <code class="docutils literal"><span class="pre">%py3_build</span></code>, which should in many cases correctly figure out what ought to be done automatically. Otherwise, duplicate the entire command and change the invocation of the python interpreter to the <code class="docutils literal"><span class="pre">%{__python2}</span></code> macro in one of them and to the <code class="docutils literal"><span class="pre">%{__python3}</span></code> in the other.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%build</span>
+<span class="nf">%{__python</span>2} custombuild.py --many-flags
+<span class="nf">%{__python</span>3} custombuild.py --many-flags
+</pre></div>
+</div>
+<p>Rarely, you might encounter some non-Python build script such as a Makefile. In these instances you have to adjust the script on your own, consult the documentation for the specific build method.</p>
+</div>
+<div class="section" id="install">
+<h3><a class="toc-backref" href="#id8">%install</a><a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">%install</span></code> section is perhaps the most crucial one, because we have to be very mindful of which executable goes where and what symlinks should be created.</p>
+<p>First, in the same manner as in the preceding <a class="reference internal" href="#build">%build</a> section, it is advisable to upgrade the current Python 2 install command to use the new <code class="docutils literal"><span class="pre">%py2_install</span></code> macro, however, if that doesn&#8217;t work for you, you can stick with the current install command, just make sure it&#8217;s invoked by the <code class="docutils literal"><span class="pre">%{__python2}</span></code> macro. The corresponding Python 3 install command will then either be the custom command prefixed by <code class="docutils literal"><span class="pre">%{__python3}</span></code> or the new <code class="docutils literal"><span class="pre">%py3_install</span></code> macro, which I&#8217;ll be using in this example.</p>
+<p>Again as in the <a class="reference internal" href="#build">%build</a> section, in the rare cases where you encounter a non-Python install script such as a Makefile, consult documentation for the specific install method and make adjustments on your own.</p>
+<p>As the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Avoiding_collisions_between_the_python_2_and_python_3_stacks">packaging guidelines</a> specify, the Python 2 package is currently to be the default one, thus it is best if we first install the Python 3 version of our software and then the one for Python 2, because in case they are installing some files into the same directories (such as <code class="docutils literal"><span class="pre">/usr/bin/</span></code>), one installation will overwrite the files of the other. So if we install the Python 2 version last, its files will be located in those shared directories.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%install</span>
+%py3_install
+
+<span class="c"># Now /usr/bin/sample-exec is Python 3, so we move it away</span>
+mv <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python3_version}</span>
+
+%py2_install
+
+<span class="c"># Now /usr/bin/sample-exec is Python 2, and we move it away anyway</span>
+mv <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python2_version}</span>
+</pre></div>
+</div>
+<div class="section" id="moving-the-executables-and-making-symlinks">
+<h4><a class="toc-backref" href="#id9">Moving the Executables and Making Symlinks</a><a class="headerlink" href="#moving-the-executables-and-making-symlinks" title="Permalink to this headline">¶</a></h4>
+<p>Again in compliance with the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Avoiding_collisions_between_the_python_2_and_python_3_stacks">packaging guidelines</a>, we should provide the executables in the format <code class="docutils literal"><span class="pre">executable-name-X.Y</span></code>, where X and Y are the major and minor Python versions, e.g. <code class="docutils literal"><span class="pre">2.7</span></code> or <code class="docutils literal"><span class="pre">3.5</span></code> (instead of hardcoding these values, you can use the macros <code class="docutils literal"><span class="pre">%{python2_version}</span></code> and <code class="docutils literal"><span class="pre">%{python3_version}</span></code>). Thus after each of the install scripts finishes, we move the resulting executable and rename it accordingly.</p>
+<p>What remains is to provide symlinks for the executables in the format <code class="docutils literal"><span class="pre">executable-name-2</span></code> and <code class="docutils literal"><span class="pre">executable-name-3</span></code>, pointing to their respective executables, and then finally a symlink for the general name, in this case <code class="docutils literal"><span class="pre">sample-exec</span></code>, which shall point to the Python 2 version symlink—here <code class="docutils literal"><span class="pre">sample-exec-2</span></code>.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="c"># The guidelines also specify we must provide symlinks with a &#39;-X&#39; suffix.</span>
+ln -s ./sample-exec-<span class="kc">%{python2_version}</span> <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-2
+ln -s ./sample-exec-<span class="kc">%{python3_version}</span> <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-3
+
+<span class="c"># Finally, we provide /usr/bin/sample-exec as a link to /usr/bin/sample-exec-2</span>
+ln -s ./sample-exec-2 <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec
+</pre></div>
+</div>
+<p>Note that these symlinks use a relative path in relation to their location, i.e. they are pointing to a file that is at any given moment in the same directory as they are.</p>
+</div>
+</div>
+<div class="section" id="check">
+<h3><a class="toc-backref" href="#id10">%check</a><a class="headerlink" href="#check" title="Permalink to this headline">¶</a></h3>
+<p>Unlike in previous sections, there&#8217;s no special macro for the <code class="docutils literal"><span class="pre">%check</span></code> section, and so here if the original spec file uses any sort of a python script for testing, just make sure that the tests are invoked once using the <code class="docutils literal"><span class="pre">%{__python2}</span></code> macro and a second time using the <code class="docutils literal"><span class="pre">%{__python3}</span></code> macro.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%check</span>
+<span class="nf">%{__python</span>2} setup.py test
+<span class="nf">%{__python</span>3} setup.py test
+</pre></div>
+</div>
+<p>Chances are that you will encounter a custom Python command that runs the tests, such as <code class="docutils literal"><span class="pre">nosetests</span></code> or <code class="docutils literal"><span class="pre">py.test</span></code>. In that case find out what is the name of the executable for Python 3 and run it after the Python 2 command.</p>
+<p>If the command for Python 2 can be invoked explicitly for Python 2, e.g. as <code class="docutils literal"><span class="pre">py.test-2</span></code> instead of just <code class="docutils literal"><span class="pre">py.test</span></code>, use it. Note that to use py.test commands, you need to have <code class="docutils literal"><span class="pre">python2-pytest</span></code> and/or <code class="docutils literal"><span class="pre">python3-pytest</span></code> listed among BuildRequires.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%check</span>
+py.test-2
+py.test-3
+
+or
+
+nosetests-<span class="kc">%{python2_version}</span>
+nosetests-<span class="kc">%{python3_version}</span>
+</pre></div>
+</div>
+<p>As you can see on the example of the <code class="docutils literal"><span class="pre">nosetests</span></code>, not all packages follow the proper naming conventions for executables. To list what executables a package contains, you can use:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> dnf repoquery -l python3-nose <span class="p">|</span> grep /usr/bin/
+<span class="go">/usr/bin/nosetests-3.4</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="files">
+<h3><a class="toc-backref" href="#id11">%files</a><a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h3>
+<p>The presence or absence of a <code class="docutils literal"><span class="pre">%files</span></code> section is the deciding factor in whether a given package or subpackage gets built or not. Therefore, to assure that our base package doesn&#8217;t get built (as all the content has been moved to the two subpackages), make sure there is no <code class="docutils literal"><span class="pre">%files</span></code> section without a subpackage name.</p>
+<p>You can reuse the current <code class="docutils literal"><span class="pre">%files</span></code> section for the Python 2 submodule by giving it the appropriate package name. You can keep it almost the same as before, just make sure that, where appropriate, it uses the new macros <code class="docutils literal"><span class="pre">%{python2_sitelib}</span></code>, <code class="docutils literal"><span class="pre">%{python2_sitearch}</span></code>, <code class="docutils literal"><span class="pre">%{python2_version}</span></code> or perhaps <code class="docutils literal"><span class="pre">%{python2_version_nodots}</span></code>. Finally, don&#8217;t forget to add the two new locations of the executable we&#8217;ve made available through the symlinks.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%files</span> -n python2-%{srcname}
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python2_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec
+<span class="kp">%{_bindir}</span>/sample-exec-2
+<span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python2_version}</span>
+</pre></div>
+</div>
+<p>Accordingly we&#8217;ll also add a <code class="docutils literal"><span class="pre">%files</span></code> section for the Python 3 subpackage. You can copy the previous files section, but make sure you change all the Python 2 macros into Python 3 versions. And unlike the former, the Python 3 <code class="docutils literal"><span class="pre">%files</span></code> section shall not contain the unversioned executable (<code class="docutils literal"><span class="pre">sample-exec</span></code> in our example) as that executable is for Python 2, not 3.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%files</span> -n python3-%{srcname}
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python3_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec-3
+<span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python3_version}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="are-shebangs-dragging-you-down-to-python-2">
+<h3><a class="toc-backref" href="#id12">Are shebangs dragging you down (to Python 2)?</a><a class="headerlink" href="#are-shebangs-dragging-you-down-to-python-2" title="Permalink to this headline">¶</a></h3>
+<p>A shebang is an indicator on the first line of an executable script that indicates in what interpreter is the script supposed to be launched, examples include <em>python, bash and perl</em>. When software gets ported to Python 3, the lone shebang often remains forgotten and keeps pointing to Python 2. In most cases this is handled automatically: the <code class="docutils literal"><span class="pre">setup.py</span></code> script (usually run through the <code class="docutils literal"><span class="pre">%py3_build</span></code> and <code class="docutils literal"><span class="pre">%py3_install</span></code> RPM macros) adjusts shebangs for you. However, sometimes it&#8217;s up to you to handle the situation.</p>
+<p>RPM has very good capabilities of automatically finding dependencies, and one of the ways it accomplishes that is by looking at the shebangs of all the files in the package. Therefore <strong>it is important to check if the shebangs are not dragging in a runtime dependency on Python 2</strong>.</p>
+<p>As the porting of the spec file is nearly finished, build it and then run the following analysis on the resulting Python 3 RPM file:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> rpm -qp --requires path/to/an.rpm <span class="p">|</span> grep -E <span class="s1">&#39;/usr/bin/(python|env)&#39;</span>
+</pre></div>
+</div>
+<p>This will list all the Python executables your RPM package depends on as well as the <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> executable which usually invokes <code class="docutils literal"><span class="pre">python</span></code>. The use of <code class="docutils literal"><span class="pre">env</span></code> is dangerous: applications should be using the safe system version of Python and not trust whatever version <code class="docutils literal"><span class="pre">env</span></code> might try to substitute. <strong>If you find that an RPM package for Python 3 depends on Python 2 or</strong> <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> <strong>you need to fix it</strong>.</p>
+<div class="section" id="fixing-shebangs">
+<h4><a class="toc-backref" href="#id13">Fixing shebangs</a><a class="headerlink" href="#fixing-shebangs" title="Permalink to this headline">¶</a></h4>
+<p>First find out what shebangs are used in your package by unpacking the sources for the project, <code class="docutils literal"><span class="pre">cd</span></code>-ing into the unpacked directory and trying the following command(s):</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="c1"># Searches for all shebangs among the sources</span>
+<span class="gp">$</span> grep -r <span class="s1">&#39;^#!/&#39;</span> .
+
+<span class="gp">$</span> <span class="c1"># Searches only Python shebangs</span>
+<span class="gp">$</span> grep -rE <span class="s1">&#39;^#!/usr/bin/(python|env python)&#39;</span> .
+</pre></div>
+</div>
+<p>You will usually find one of these two shebangs:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>#!/usr/bin/python
+#!/usr/bin/env python
+</pre></div>
+</div>
+<p>It is advisable to change both of these to <code class="docutils literal"><span class="pre">#!/usr/bin/python3</span></code>. <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> can be useful for scripts, but applications should link to the system version of Python outright.</p>
+<p>To change the shebangs in the files you can use one (or a combination) of the following commands, which you should place at the end of the <code class="docutils literal"><span class="pre">%prep</span></code> section. They will change the shebangs to point to the Python 3 interpreter stored in the <code class="docutils literal"><span class="pre">${__python3}</span></code> macro.</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="c1"># Change shebang in individual files</span>
+<span class="gp">$</span> sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=&#39;</span> path/to/file1 file2 file3 ...
+
+<span class="gp">$</span> <span class="c1"># Change shebang in all relevant files in this directory and all subdirectories</span>
+<span class="gp">$</span> <span class="c1"># See `man find` for how the `-exec command {} +` syntax works</span>
+<span class="gp">$</span> find -type f -exec sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=&#39;</span> <span class="o">{}</span> +
+
+<span class="gp">$</span> <span class="c1"># Change shebang in all relevant executable files in this directory and all subdirectories</span>
+<span class="gp">$</span> find -type f -executable -exec sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=&#39;</span> <span class="o">{}</span> +
+</pre></div>
+</div>
+<p>You don&#8217;t have to worry about accidentally corrupting other files as these scripts will only change a file if the beginning of its first line exactly matches one of the two aforementioned shebangs.</p>
+</div>
+</div>
+</div>
+<div class="section" id="ported-rpm-spec-file">
+<h2><a class="toc-backref" href="#id14">Ported RPM spec file</a><a class="headerlink" href="#ported-rpm-spec-file" title="Permalink to this headline">¶</a></h2>
+<p>Here you can peruse the entire ported spec file:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%global srcname example
+
+<span class="gh">Name</span><span class="p">:</span>           python-<span class="kc">%{srcname}</span>
+<span class="gh">Version</span><span class="p">:</span>        1.2.3
+<span class="gh">Release</span><span class="p">:</span>        2<span class="nv">%{?dist}</span>
+<span class="gh">Summary</span><span class="p">:</span>        An example Python tool
+
+<span class="gh">License</span><span class="p">:</span>        MIT
+<span class="gh">URL</span><span class="p">:</span>            http://pypi.python.org/pypi/<span class="kc">%{srcname}</span>
+<span class="gh">Source0</span><span class="p">:</span>        https://files.pythonhosted.org/packages/source/e/<span class="kc">%{srcname}</span>/<span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>.tar.gz
+
+<span class="gh">BuildArch</span><span class="p">:</span>      noarch
+<span class="gh">BuildRequires</span><span class="p">:</span>  python2-devel
+<span class="gh">BuildRequires</span><span class="p">:</span>  python3-devel
+
+<span class="nd">%description</span>
+A Python tool which provides a convenient example.
+
+
+<span class="nd">%package</span> -n python2-%{srcname}
+<span class="gh">Summary</span><span class="p">:</span>        <span class="kc">%{summary}</span>
+<span class="gh">Requires</span><span class="p">:</span>       python-some-module
+<span class="gh">Requires</span><span class="p">:</span>       python2-other-module
+%{?python_provide:%python_provide python2-<span class="kc">%{srcname}</span>}
+
+<span class="nd">%description</span> -n python2-%{srcname}
+A Python tool which provides a convenient example.
+
+
+<span class="nd">%package</span> -n python3-%{srcname}
+<span class="gh">Summary</span><span class="p">:</span>        <span class="kc">%{summary}</span>
+<span class="gh">Requires</span><span class="p">:</span>       python3-some-module
+<span class="gh">Requires</span><span class="p">:</span>       python3-other-module
+%{?python_provide:%python_provide python3-<span class="kc">%{srcname}</span>}
+
+<span class="nd">%description</span> -n python3-%{srcname}
+A Python tool which provides a convenient example.
+
+
+<span class="nd">%prep</span>
+%autosetup -n <span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>
+
+
+<span class="nd">%build</span>
+%py2_build
+%py3_build
+
+
+<span class="nd">%install</span>
+<span class="c"># Here we have to think about the order, because the scripts in /usr/bin are</span>
+<span class="c"># overwritten with every setup.py install.</span>
+<span class="c"># If the script in /usr/bin provides the same functionality regardless</span>
+<span class="c"># of the Python version, we only provide Python 3 version and we need to run</span>
+<span class="c"># the py3_install after py2_install.</span>
+
+<span class="c"># If we need to include the executable both for Python 2 and 3--for example</span>
+<span class="c"># because it interacts with code from the user--then the default executable</span>
+<span class="c"># should be the one for Python 2.</span>
+<span class="c"># We are going to assume that case here, because it is a bit more complex.</span>
+
+%py3_install
+
+<span class="c"># Now /usr/bin/sample-exec is Python 3, so we move it away</span>
+mv <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python3_version}</span>
+
+%py2_install
+
+<span class="c"># Now /usr/bin/sample-exec is Python 2, and we move it away anyway</span>
+mv <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python2_version}</span>
+
+<span class="c"># The guidelines also specify we must provide symlinks with a &#39;-X&#39; suffix.</span>
+ln -s ./sample-exec-<span class="kc">%{python2_version}</span> <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-2
+ln -s ./sample-exec-<span class="kc">%{python3_version}</span> <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec-3
+
+<span class="c"># Finally, we provide /usr/bin/sample-exec as a link to /usr/bin/sample-exec-2</span>
+ln -s ./sample-exec-2 <span class="kc">%{buildroot}</span><span class="kp">%{_bindir}</span>/sample-exec
+
+
+<span class="nd">%check</span>
+<span class="nf">%{__python</span>2} setup.py test
+<span class="nf">%{__python</span>3} setup.py test
+
+
+<span class="c"># Note that there is no %%files section for the unversioned Python package</span>
+<span class="c"># if we are building for several Python runtimes</span>
+<span class="nd">%files</span> -n python2-%{srcname}
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python2_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec
+<span class="kp">%{_bindir}</span>/sample-exec-2
+<span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python2_version}</span>
+
+<span class="nd">%files</span> -n python3-%{srcname}
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python3_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec-3
+<span class="kp">%{_bindir}</span>/sample-exec-<span class="kc">%{python3_version}</span>
+
+
+<span class="nd">%changelog</span>
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="diff-of-the-changes">
+<h2><a class="toc-backref" href="#id15">Diff of the changes</a><a class="headerlink" href="#diff-of-the-changes" title="Permalink to this headline">¶</a></h2>
+<p>And here you can see the diff of the original and the ported spec files to fully observe all the changes that were made:</p>
+<div class="highlight-udiff"><div class="highlight"><pre><span></span><span class="gd">--- specs/tool.spec.orig</span>
+<span class="gi">+++ specs/tool.spec</span>
+<span class="gu">@@ -2,7 +2,7 @@</span>
+ 
+ Name:           python-%{srcname}
+ Version:        1.2.3
+<span class="gd">-Release:        1%{?dist}</span>
+<span class="gi">+Release:        2%{?dist}</span>
+ Summary:        An example Python tool
+ 
+ License:        MIT
+<span class="gu">@@ -10,11 +10,30 @@</span>
+ Source0:        https://files.pythonhosted.org/packages/source/e/%{srcname}/%{srcname}-%{version}.tar.gz
+ 
+ BuildArch:      noarch
+<span class="gd">-BuildRequires:  python-devel</span>
+<span class="gd">-Requires: python-some-module</span>
+<span class="gd">-Requires: python2-other-module</span>
+<span class="gi">+BuildRequires:  python2-devel</span>
+<span class="gi">+BuildRequires:  python3-devel</span>
+ 
+ %description
+<span class="gi">+A Python tool which provides a convenient example.</span>
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gi">+%package -n python2-%{srcname}</span>
+<span class="gi">+Summary:        %{summary}</span>
+<span class="gi">+Requires:       python-some-module</span>
+<span class="gi">+Requires:       python2-other-module</span>
+<span class="gi">+%{?python_provide:%python_provide python2-%{srcname}}</span>
+<span class="gi">+</span>
+<span class="gi">+%description -n python2-%{srcname}</span>
+<span class="gi">+A Python tool which provides a convenient example.</span>
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gi">+%package -n python3-%{srcname}</span>
+<span class="gi">+Summary:        %{summary}</span>
+<span class="gi">+Requires:       python3-some-module</span>
+<span class="gi">+Requires:       python3-other-module</span>
+<span class="gi">+%{?python_provide:%python_provide python3-%{srcname}}</span>
+<span class="gi">+</span>
+<span class="gi">+%description -n python3-%{srcname}</span>
+ A Python tool which provides a convenient example.
+ 
+ 
+<span class="gu">@@ -23,22 +42,61 @@</span>
+ 
+ 
+ %build
+<span class="gd">-%{__python} setup.py build</span>
+<span class="gi">+%py2_build</span>
+<span class="gi">+%py3_build</span>
+ 
+ 
+ %install
+<span class="gd">-%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT</span>
+<span class="gi">+# Here we have to think about the order, because the scripts in /usr/bin are</span>
+<span class="gi">+# overwritten with every setup.py install.</span>
+<span class="gi">+# If the script in /usr/bin provides the same functionality regardless</span>
+<span class="gi">+# of the Python version, we only provide Python 3 version and we need to run</span>
+<span class="gi">+# the py3_install after py2_install.</span>
+<span class="gi">+</span>
+<span class="gi">+# If we need to include the executable both for Python 2 and 3--for example</span>
+<span class="gi">+# because it interacts with code from the user--then the default executable</span>
+<span class="gi">+# should be the one for Python 2.</span>
+<span class="gi">+# We are going to assume that case here, because it is a bit more complex.</span>
+<span class="gi">+</span>
+<span class="gi">+%py3_install</span>
+<span class="gi">+</span>
+<span class="gi">+# Now /usr/bin/sample-exec is Python 3, so we move it away</span>
+<span class="gi">+mv %{buildroot}%{_bindir}/sample-exec %{buildroot}%{_bindir}/sample-exec-%{python3_version}</span>
+<span class="gi">+</span>
+<span class="gi">+%py2_install</span>
+<span class="gi">+</span>
+<span class="gi">+# Now /usr/bin/sample-exec is Python 2, and we move it away anyway</span>
+<span class="gi">+mv %{buildroot}%{_bindir}/sample-exec %{buildroot}%{_bindir}/sample-exec-%{python2_version}</span>
+<span class="gi">+</span>
+<span class="gi">+# The guidelines also specify we must provide symlinks with a &#39;-X&#39; suffix.</span>
+<span class="gi">+ln -s ./sample-exec-%{python2_version} %{buildroot}%{_bindir}/sample-exec-2</span>
+<span class="gi">+ln -s ./sample-exec-%{python3_version} %{buildroot}%{_bindir}/sample-exec-3</span>
+<span class="gi">+</span>
+<span class="gi">+# Finally, we provide /usr/bin/sample-exec as a link to /usr/bin/sample-exec-2</span>
+<span class="gi">+ln -s ./sample-exec-2 %{buildroot}%{_bindir}/sample-exec</span>
+ 
+ 
+ %check
+<span class="gd">-%{__python} setup.py test</span>
+<span class="gi">+%{__python2} setup.py test</span>
+<span class="gi">+%{__python3} setup.py test</span>
+ 
+ 
+<span class="gd">-%files</span>
+<span class="gi">+# Note that there is no %%files section for the unversioned Python package</span>
+<span class="gi">+# if we are building for several Python runtimes</span>
+<span class="gi">+%files -n python2-%{srcname}</span>
+ %license COPYING
+ %doc README
+<span class="gd">-%{python_sitelib}/*</span>
+<span class="gi">+%{python2_sitelib}/*</span>
+ %{_bindir}/sample-exec
+<span class="gi">+%{_bindir}/sample-exec-2</span>
+<span class="gi">+%{_bindir}/sample-exec-%{python2_version}</span>
+<span class="gi">+</span>
+<span class="gi">+%files -n python3-%{srcname}</span>
+<span class="gi">+%license COPYING</span>
+<span class="gi">+%doc README</span>
+<span class="gi">+%{python3_sitelib}/*</span>
+<span class="gi">+%{_bindir}/sample-exec-3</span>
+<span class="gi">+%{_bindir}/sample-exec-%{python3_version}</span>
+ 
+ 
+ %changelog
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="naming-scheme.html" class="btn btn-neutral float-right" title="New Python package naming scheme" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="application-modules.html" class="btn btn-neutral" title="Porting an application and a module in one package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Red Hat, Inc., CC BY-SA, examples CC0.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

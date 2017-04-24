@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Porting applications that happen to be written in Python &mdash; Python RPM Porting Guide 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Python RPM Porting Guide 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Porting Python modules" href="modules.html"/>
+        <link rel="prev" title="Welcome to the Python RPM Porting Guide" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Python RPM Porting Guide
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to the Python RPM Porting Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Porting applications that happen to be written in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#porting-the-specfile-to-python-3">Porting the specfile to Python 3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modifications">Modifications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#buildrequires-and-requires">BuildRequires and Requires</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build">%build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-and-check">%install and %check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files">%files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#are-shebangs-dragging-you-down-to-python-2">Are shebangs dragging you down (to Python 2)?</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fixing-shebangs">Fixing shebangs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ported-rpm-spec-file">Ported RPM spec file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#diff-of-the-changes">Diff of the changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Porting Python modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application-modules.html">Porting an application and a module in one package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools for programming in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="naming-scheme.html">New Python package naming scheme</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Python RPM Porting Guide</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Porting applications that happen to be written in Python</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/applications.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="porting-applications-that-happen-to-be-written-in-python">
+<h1>Porting applications that happen to be written in Python<a class="headerlink" href="#porting-applications-that-happen-to-be-written-in-python" title="Permalink to this headline">¶</a></h1>
+<p>The section for applications is for software where the user doesn&#8217;t care in which programming language it is written. For example, it doesn&#8217;t matter if it is written in Python 2 or 3 because the application should run the same.</p>
+<p>Applications have to have an executable, which you can check by running <code class="docutils literal"><span class="pre">dnf</span> <span class="pre">repoquery</span> <span class="pre">-l</span> <span class="pre">your-package-name</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">/usr/bin/</span></code>.</p>
+<p>If your package is not being imported by third-party projects (e.g. <code class="docutils literal"><span class="pre">import</span> <span class="pre">some_module</span></code> in a Python file), it is most likely an application.</p>
+<p>Try running <code class="docutils literal"><span class="pre">dnf</span> <span class="pre">repoquery</span> <span class="pre">--whatrequires</span> <span class="pre">your-package-name</span></code> to see a list of packages that depend on yours. If there are none, your package is likely an application, because there would be little reason to package a module that nobody uses. However, if there are some packages that depend on yours, we cannot be sure if it&#8217;s an application-only package or not, as some of these packages might be depending on your application itself, instead of importing modules from your package.</p>
+<p>If this doesn&#8217;t fit your package, look into <a class="reference internal" href="index.html#chosing-type-section"><span class="std std-ref">other sections</span></a>.</p>
+<div class="contents local topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#porting-the-specfile-to-python-3" id="id1">Porting the specfile to Python 3</a></li>
+<li><a class="reference internal" href="#modifications" id="id2">Modifications</a><ul>
+<li><a class="reference internal" href="#buildrequires-and-requires" id="id3">BuildRequires and Requires</a></li>
+<li><a class="reference internal" href="#build" id="id4">%build</a></li>
+<li><a class="reference internal" href="#install-and-check" id="id5">%install and %check</a></li>
+<li><a class="reference internal" href="#files" id="id6">%files</a></li>
+<li><a class="reference internal" href="#are-shebangs-dragging-you-down-to-python-2" id="id7">Are shebangs dragging you down (to Python 2)?</a><ul>
+<li><a class="reference internal" href="#fixing-shebangs" id="id8">Fixing shebangs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ported-rpm-spec-file" id="id9">Ported RPM spec file</a></li>
+<li><a class="reference internal" href="#diff-of-the-changes" id="id10">Diff of the changes</a></li>
+</ul>
+</div>
+<div class="section" id="porting-the-specfile-to-python-3">
+<h2><a class="toc-backref" href="#id1">Porting the specfile to Python 3</a><a class="headerlink" href="#porting-the-specfile-to-python-3" title="Permalink to this headline">¶</a></h2>
+<p>Applications behave the same when run under Python 2 and Python 3, therefore all you need to do is change the spec file to use Python 3 instead of Python 2.</p>
+<p>In essence, porting of an application RPM mostly consists of going through the spec file and adding number 3 or substituting number 3 for number 2 where appropriate. Occasionally also substituting old macros for new ones that are more versatile.</p>
+<p>So let&#8217;s take an example spec file and port it to illustrate the process. We start with a spec file for an application that is being run with Python 2:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%global srcname example
+
+<span class="gh">Name</span><span class="p">:</span>           <span class="kc">%{srcname}</span>
+<span class="gh">Version</span><span class="p">:</span>        1.2.3
+<span class="gh">Release</span><span class="p">:</span>        1<span class="nv">%{?dist}</span>
+<span class="gh">Summary</span><span class="p">:</span>        An example Python application
+
+<span class="gh">License</span><span class="p">:</span>        MIT
+<span class="gh">URL</span><span class="p">:</span>            http://pypi.python.org/pypi/<span class="kc">%{srcname}</span>
+<span class="gh">Source0</span><span class="p">:</span>        https://files.pythonhosted.org/packages/source/e/<span class="kc">%{srcname}</span>/<span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>.tar.gz
+
+<span class="gh">BuildArch</span><span class="p">:</span>      noarch
+<span class="gh">BuildRequires</span><span class="p">:</span>  python-devel
+
+<span class="nd">%description</span>
+A Python application which provides a convenient example.
+
+
+<span class="nd">%prep</span>
+%autosetup -n <span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>
+
+
+<span class="nd">%build</span>
+<span class="nf">%{__python}</span> setup.py build
+
+
+<span class="nd">%install</span>
+<span class="nf">%{__python}</span> setup.py install --skip-build --root <span class="vg">$RPM_BUILD_ROOT</span>
+
+
+<span class="nd">%check</span>
+<span class="nf">%{__python}</span> setup.py test
+
+
+<span class="nd">%files</span>
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec
+
+
+<span class="nd">%changelog</span>
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="modifications">
+<h2><a class="toc-backref" href="#id2">Modifications</a><a class="headerlink" href="#modifications" title="Permalink to this headline">¶</a></h2>
+<p>First it is recommended to update the software you are packaging to its newest upstream version. If it already is at the latest version, increment the release number. Don&#8217;t forget to add a <code class="docutils literal"><span class="pre">%changelog</span></code> entry as well.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this document you will encounter lot of RPM macros. You can look up many of the Python macros in the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Python#Macros">Python packaging guidelines</a> (click the <strong>Expand button</strong> on the right side).</p>
+</div>
+<div class="section" id="buildrequires-and-requires">
+<h3><a class="toc-backref" href="#id3">BuildRequires and Requires</a><a class="headerlink" href="#buildrequires-and-requires" title="Permalink to this headline">¶</a></h3>
+<p>Change <code class="docutils literal"><span class="pre">BuildRequires</span></code> from <code class="docutils literal"><span class="pre">python-devel</span></code> to <code class="docutils literal"><span class="pre">python3-devel</span></code> and adjust all other <code class="docutils literal"><span class="pre">Requires</span></code> and <code class="docutils literal"><span class="pre">BuildRequires</span></code> entries to point only to python3 packages.</p>
+<p><strong>It is very important that you don&#8217;t use any Python 2 dependencies as that would make your package depend both on Python version 2 and version 3, which would render your porting efforts useless.</strong></p>
+</div>
+<div class="section" id="build">
+<h3><a class="toc-backref" href="#id4">%build</a><a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h3>
+<p>In the build section you can find a variety of macros, for example <code class="docutils literal"><span class="pre">%py_build</span></code> and its newer version <code class="docutils literal"><span class="pre">%py2_build</span></code>. You can freely substitute these by the new Python 3 macro <code class="docutils literal"><span class="pre">%py3_build</span></code>.</p>
+<p>Occasionally you will find a custom build command prefixed by the <code class="docutils literal"><span class="pre">%{__python}</span></code> or <code class="docutils literal"><span class="pre">%{__python2}</span></code> macros, or in some cases just prefixed by the Python interpreter invoked without a macro at all, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="p">{</span><span class="n">__python</span><span class="p">}</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
+    <span class="ow">or</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>In these cases first try substituting the whole build command by the new smart macro <code class="docutils literal"><span class="pre">%py3_build</span></code> which should in many cases correctly figure out what ought to be done automatically. Otherwise change the invocation of the Python interpreter to the <code class="docutils literal"><span class="pre">%{__python3}</span></code> macro.</p>
+<p>In rare cases, you might encounter some non-Python build script such as a Makefile. In these instances you have to adjust the script on your own, consult the documentation for the specific build method.</p>
+</div>
+<div class="section" id="install-and-check">
+<h3><a class="toc-backref" href="#id5">%install and %check</a><a class="headerlink" href="#install-and-check" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">%install</span></code> section will oftentimes contain the <code class="docutils literal"><span class="pre">%py_install</span></code> and <code class="docutils literal"><span class="pre">%py2_install</span></code> macros; you can replace these with the new Python 3 macro <code class="docutils literal"><span class="pre">%py3_install</span></code>.</p>
+<p>Furthermore, as in the preceding <a class="reference internal" href="#build">%build</a> section, you will frequently find custom scripts or commands prefixed by either the <code class="docutils literal"><span class="pre">%{__python}</span></code> or <code class="docutils literal"><span class="pre">%{__python2}</span></code> macros or simply preceded by an invocation of the Python interpreter without the use of macros at all.</p>
+<p>In the install section, try substituting it with the new <code class="docutils literal"><span class="pre">%py3_install</span></code> macro, which should figure out what to do automatically. If that doesn&#8217;t work, or if you&#8217;re porting the <code class="docutils literal"><span class="pre">%check</span></code> section, just make sure that any custom scripts or commands are invoked by the new <code class="docutils literal"><span class="pre">%{__python3}</span></code> macro.</p>
+<p>Again as in the <a class="reference internal" href="#build">%build</a> section, in the rare cases where you encounter a non-Python install script such as a Makefile, consult documentation for the specific install method and make adjustments on your own.</p>
+<p>Lastly, in the <code class="docutils literal"><span class="pre">%check</span></code> section you can also encounter a custom Python command that runs the tests, such as <code class="docutils literal"><span class="pre">nosetests</span></code> or <code class="docutils literal"><span class="pre">py.test</span></code>. In that case find out what is the name of the executable for Python 3 and use it instead of the Python 2 version.</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%check</span>
+py.test-3
+or
+nosetests-<span class="kc">%{python3_version}</span>
+</pre></div>
+</div>
+<p>As you can see on the example of the <code class="docutils literal"><span class="pre">nosetests</span></code>, not all packages follow the proper naming conventions for executables. To list what executables a package contains, you can use:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> dnf repoquery -l python3-nose <span class="p">|</span> grep /usr/bin/
+<span class="go">/usr/bin/nosetests-3.4</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="files">
+<h3><a class="toc-backref" href="#id6">%files</a><a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h3>
+<p>In the files section you can regularly find the following macros: <code class="docutils literal"><span class="pre">%{python2_sitelib}</span></code>, <code class="docutils literal"><span class="pre">%{python2_sitearch}</span></code>, <code class="docutils literal"><span class="pre">%{python2_version}</span></code>, <code class="docutils literal"><span class="pre">%{python2_version_nodots}</span></code> or their unversioned alternatives. Substitute these with their counterparts for Python 3, e.g. <code class="docutils literal"><span class="pre">%{python3_sitelib}</span></code>.</p>
+<p>The files section may also contain the versioned executable, usually <code class="docutils literal"><span class="pre">%{_bindir}/sample-exec-2.7</span></code> in which case it should be substituted by <code class="docutils literal"><span class="pre">%{_bindir}/sample-exec-%{python3_version}</span></code>.</p>
+</div>
+<div class="section" id="are-shebangs-dragging-you-down-to-python-2">
+<h3><a class="toc-backref" href="#id7">Are shebangs dragging you down (to Python 2)?</a><a class="headerlink" href="#are-shebangs-dragging-you-down-to-python-2" title="Permalink to this headline">¶</a></h3>
+<p>A shebang is an indicator on the first line of an executable script that indicates in what interpreter is the script supposed to be launched, examples include <em>python, bash and perl</em>. When software gets ported to Python 3, the lone shebang often remains forgotten and keeps pointing to Python 2. In most cases this is handled automatically: the <code class="docutils literal"><span class="pre">setup.py</span></code> script (usually run through the <code class="docutils literal"><span class="pre">%py3_build</span></code> and <code class="docutils literal"><span class="pre">%py3_install</span></code> RPM macros) adjusts shebangs for you. However, sometimes it&#8217;s up to you to handle the situation.</p>
+<p>RPM has very good capabilities of automatically finding dependencies, and one of the ways it accomplishes that is by looking at the shebangs of all the files in the package. Therefore <strong>it is important to check if the shebangs are not dragging in a runtime dependency on Python 2</strong>.</p>
+<p>As the porting of the spec file is nearly finished, build it and then run the following analysis on the resulting Python 3 RPM file:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> rpm -qp --requires path/to/an.rpm <span class="p">|</span> grep -E <span class="s1">&#39;/usr/bin/(python|env)&#39;</span>
+</pre></div>
+</div>
+<p>This will list all the Python executables your RPM package depends on as well as the <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> executable which usually invokes <code class="docutils literal"><span class="pre">python</span></code>. The use of <code class="docutils literal"><span class="pre">env</span></code> is dangerous: applications should be using the safe system version of Python and not trust whatever version <code class="docutils literal"><span class="pre">env</span></code> might try to substitute. <strong>If you find that an RPM package for Python 3 depends on Python 2 or</strong> <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> <strong>you need to fix it</strong>.</p>
+<div class="section" id="fixing-shebangs">
+<h4><a class="toc-backref" href="#id8">Fixing shebangs</a><a class="headerlink" href="#fixing-shebangs" title="Permalink to this headline">¶</a></h4>
+<p>First find out what shebangs are used in your package by unpacking the sources for the project, <code class="docutils literal"><span class="pre">cd</span></code>-ing into the unpacked directory and trying the following command(s):</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="c1"># Searches for all shebangs among the sources</span>
+<span class="gp">$</span> grep -r <span class="s1">&#39;^#!/&#39;</span> .
+
+<span class="gp">$</span> <span class="c1"># Searches only Python shebangs</span>
+<span class="gp">$</span> grep -rE <span class="s1">&#39;^#!/usr/bin/(python|env python)&#39;</span> .
+</pre></div>
+</div>
+<p>You will usually find one of these two shebangs:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>#!/usr/bin/python
+#!/usr/bin/env python
+</pre></div>
+</div>
+<p>It is advisable to change both of these to <code class="docutils literal"><span class="pre">#!/usr/bin/python3</span></code>. <code class="docutils literal"><span class="pre">/usr/bin/env</span></code> can be useful for scripts, but applications should link to the system version of Python outright.</p>
+<p>To change the shebangs in the files you can use one (or a combination) of the following commands, which you should place at the end of the <code class="docutils literal"><span class="pre">%prep</span></code> section. They will change the shebangs to point to the Python 3 interpreter stored in the <code class="docutils literal"><span class="pre">${__python3}</span></code> macro.</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="c1"># Change shebang in individual files</span>
+<span class="gp">$</span> sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[0-9.]*=#!%{__python3}=&#39;</span> path/to/file1 file2 file3 ...
+
+<span class="gp">$</span> <span class="c1"># Change shebang in all relevant files in this directory and all subdirectories</span>
+<span class="gp">$</span> <span class="c1"># See `man find` for how the `-exec command {} +` syntax works</span>
+<span class="gp">$</span> find -type f -exec sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=&#39;</span> <span class="o">{}</span> +
+
+<span class="gp">$</span> <span class="c1"># Change shebang in all relevant executable files in this directory and all subdirectories</span>
+<span class="gp">$</span> find -type f -executable -exec sed -i <span class="s1">&#39;1s=^#!/usr/bin/\(python\|env python\)[23]\?=#!%{__python3}=&#39;</span> <span class="o">{}</span> +
+</pre></div>
+</div>
+<p>You don&#8217;t have to worry about accidentally corrupting other files as these scripts will only change a file if the beginning of its first line exactly matches one of the two aforementioned shebangs.</p>
+</div>
+</div>
+</div>
+<div class="section" id="ported-rpm-spec-file">
+<h2><a class="toc-backref" href="#id9">Ported RPM spec file</a><a class="headerlink" href="#ported-rpm-spec-file" title="Permalink to this headline">¶</a></h2>
+<p>Here you can peruse the entire ported spec file:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%global srcname example
+
+<span class="gh">Name</span><span class="p">:</span>           <span class="kc">%{srcname}</span>
+<span class="gh">Version</span><span class="p">:</span>        1.2.3
+<span class="gh">Release</span><span class="p">:</span>        2<span class="nv">%{?dist}</span>
+<span class="gh">Summary</span><span class="p">:</span>        An example Python application
+
+<span class="gh">License</span><span class="p">:</span>        MIT
+<span class="gh">URL</span><span class="p">:</span>            http://pypi.python.org/pypi/<span class="kc">%{srcname}</span>
+<span class="gh">Source0</span><span class="p">:</span>        https://files.pythonhosted.org/packages/source/e/<span class="kc">%{srcname}</span>/<span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>.tar.gz
+
+<span class="gh">BuildArch</span><span class="p">:</span>      noarch
+<span class="gh">BuildRequires</span><span class="p">:</span>  python3-devel
+
+<span class="nd">%description</span>
+A Python application which provides a convenient example.
+
+
+<span class="nd">%prep</span>
+%autosetup -n <span class="kc">%{srcname}</span>-<span class="kc">%{version}</span>
+
+
+<span class="nd">%build</span>
+%py3_build
+
+
+<span class="nd">%install</span>
+%py3_install
+
+
+<span class="nd">%check</span>
+<span class="nf">%{__python</span>3} setup.py test
+
+
+<span class="nd">%files</span>
+%license COPYING
+<span class="k">%doc</span> README
+<span class="kc">%{python3_sitelib}</span>/*
+<span class="kp">%{_bindir}</span>/sample-exec
+
+
+<span class="nd">%changelog</span>
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="diff-of-the-changes">
+<h2><a class="toc-backref" href="#id10">Diff of the changes</a><a class="headerlink" href="#diff-of-the-changes" title="Permalink to this headline">¶</a></h2>
+<p>And here you can see the diff of the original and the ported spec files to fully observe all the changes that were made:</p>
+<div class="highlight-udiff"><div class="highlight"><pre><span></span><span class="gd">--- specs/application.spec.orig</span>
+<span class="gi">+++ specs/application.spec</span>
+<span class="gu">@@ -2,7 +2,7 @@</span>
+ 
+ Name:           %{srcname}
+ Version:        1.2.3
+<span class="gd">-Release:        1%{?dist}</span>
+<span class="gi">+Release:        2%{?dist}</span>
+ Summary:        An example Python application
+ 
+ License:        MIT
+<span class="gu">@@ -10,7 +10,7 @@</span>
+ Source0:        https://files.pythonhosted.org/packages/source/e/%{srcname}/%{srcname}-%{version}.tar.gz
+ 
+ BuildArch:      noarch
+<span class="gd">-BuildRequires:  python-devel</span>
+<span class="gi">+BuildRequires:  python3-devel</span>
+ 
+ %description
+ A Python application which provides a convenient example.
+<span class="gu">@@ -21,21 +21,21 @@</span>
+ 
+ 
+ %build
+<span class="gd">-%{__python} setup.py build</span>
+<span class="gi">+%py3_build</span>
+ 
+ 
+ %install
+<span class="gd">-%{__python} setup.py install --skip-build --root $RPM_BUILD_ROOT</span>
+<span class="gi">+%py3_install</span>
+ 
+ 
+ %check
+<span class="gd">-%{__python} setup.py test</span>
+<span class="gi">+%{__python3} setup.py test</span>
+ 
+ 
+ %files
+ %license COPYING
+ %doc README
+<span class="gd">-%{python_sitelib}/*</span>
+<span class="gi">+%{python3_sitelib}/*</span>
+ %{_bindir}/sample-exec
+ 
+ 
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="Porting Python modules" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to the Python RPM Porting Guide" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Red Hat, Inc., CC BY-SA, examples CC0.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

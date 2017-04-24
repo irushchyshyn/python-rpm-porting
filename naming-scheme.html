@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>New Python package naming scheme &mdash; Python RPM Porting Guide 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Python RPM Porting Guide 0.1 documentation" href="index.html"/>
+        <link rel="prev" title="Tools for programming in Python" href="tools.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Python RPM Porting Guide
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to the Python RPM Porting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Porting applications that happen to be written in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Porting Python modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="application-modules.html">Porting an application and a module in one package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools for programming in Python</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">New Python package naming scheme</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-is-this-important">Why is this important?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-needs-to-be-changed">What needs to be changed?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#common-naming-scheme-violations">Common naming scheme violations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#required-changes">Required changes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#add-a-package-section-for-the-python-2-subpackage">Add a <code class="docutils literal"><span class="pre">%package</span></code> section for the Python 2 subpackage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#use-the-python-provide-macro-in-the-python-3-subpackage">Use the <code class="docutils literal"><span class="pre">%python_provide</span></code> macro in the Python 3 subpackage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rename-the-files-section">Rename the <code class="docutils literal"><span class="pre">%files</span></code> section</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Python RPM Porting Guide</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>New Python package naming scheme</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/naming-scheme.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="new-python-package-naming-scheme">
+<h1>New Python package naming scheme<a class="headerlink" href="#new-python-package-naming-scheme" title="Permalink to this headline">¶</a></h1>
+<p>If you have ported your package according to the guidance in previous sections, then it most certainly complies with the <a class="reference external" href="https://fedoraproject.org/wiki/Packaging:Naming?rd=Packaging:NamingGuidelines#Python_source_package_naming">Python package naming guidelines</a>. However, you might have done it before this guide came to life or even before the naming guidelines changed, which might mean that some name changes are required. This section is here to walk you through them.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section is related to the renaming of Python <strong>binary RPM</strong> packages to avoid using the <code class="docutils literal"><span class="pre">python-</span></code> prefix without a version. Changing the main package/SRPM name is not required.</p>
+</div>
+<div class="section" id="why-is-this-important">
+<h2>Why is this important?<a class="headerlink" href="#why-is-this-important" title="Permalink to this headline">¶</a></h2>
+<p>When the time comes and <code class="docutils literal"><span class="pre">python</span></code> means Python 3 in Fedora, installing a <code class="docutils literal"><span class="pre">python-&lt;srcname&gt;</span></code> package will imply a Python 3 version of this package. This is planned for 2020, when upstream support for Python 2 ends. To achieve this, all Python binary RPM packages have to follow the new naming scheme and use the <code class="docutils literal"><span class="pre">%python_provide</span></code> macro, devised to make the switch easier. However, we are still far away from achieving this goal.</p>
+<p>Using the outdated naming scheme in your subpackage names or run-time/build-time requirements might cause a range of issues when the switch happens.</p>
+</div>
+<div class="section" id="what-needs-to-be-changed">
+<h2>What needs to be changed?<a class="headerlink" href="#what-needs-to-be-changed" title="Permalink to this headline">¶</a></h2>
+<p>Check the names of binary RPM packages you are building from your SRPM, and if you use one of the following naming schemes, you&#8217;ll find instructions on how to fix it in the <a class="reference internal" href="#required-changes">section below</a>.</p>
+<div class="section" id="common-naming-scheme-violations">
+<span id="id1"></span><h3>Common naming scheme violations<a class="headerlink" href="#common-naming-scheme-violations" title="Permalink to this headline">¶</a></h3>
+<p>See the following naming schemes which violate the current naming guidelines:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head stub">SRPM</th>
+<th class="head">Binary RPMs built</th>
+<th class="head">Violation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><th class="stub">python-&lt;srcname&gt;</th>
+<td><div class="first last line-block">
+<div class="line">python-&lt;srcname&gt;</div>
+</div>
+</td>
+<td>unversioned <cite>python-</cite> prefix in the binary package</td>
+</tr>
+<tr class="row-odd"><th class="stub">python-&lt;srcname&gt;</th>
+<td><div class="first last line-block">
+<div class="line">python-&lt;srcname&gt;</div>
+<div class="line">python3-&lt;srcname&gt;</div>
+</div>
+</td>
+<td>unversioned <cite>python-</cite> prefix in the binary package</td>
+</tr>
+<tr class="row-even"><th class="stub">&lt;srcname&gt;</th>
+<td><div class="first last line-block">
+<div class="line">&lt;srcname&gt;</div>
+<div class="line">python3-&lt;srcname&gt;</div>
+</div>
+</td>
+<td>missing <cite>python2-</cite> prefix in the binary package</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="required-changes">
+<span id="id2"></span><h3>Required changes<a class="headerlink" href="#required-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="add-a-package-section-for-the-python-2-subpackage">
+<h4>Add a <code class="docutils literal"><span class="pre">%package</span></code> section for the Python 2 subpackage<a class="headerlink" href="#add-a-package-section-for-the-python-2-subpackage" title="Permalink to this headline">¶</a></h4>
+<p>To rename the binary RPM package to <code class="docutils literal"><span class="pre">python2-&lt;srcname&gt;</span></code>, you should build it as a subpackage with an appropriate name. Make sure to move all related runtime requirements from the main package to the new subpackage and use the <a class="reference external" href="modules.html#python-provide">%python_provide</a> macro, which will provide both <code class="docutils literal"><span class="pre">python-&lt;srcname&gt;</span></code> and <code class="docutils literal"><span class="pre">python2-&lt;srcname&gt;</span></code> until the switch to Python 3 happens.</p>
+<p>The change should look like this:</p>
+<div class="highlight-udiff"><div class="highlight"><pre><span></span> BuildArch:      noarch
+<span class="gd">-BuildRequires:  python-devel</span>
+<span class="gd">-Requires:       python-some-module</span>
+<span class="gd">-Requires:       python2-other-module</span>
+<span class="gi">+BuildRequires:  python2-devel</span>
+ 
+ %description
+<span class="gi">+A Python module which provides a convenient example.</span>
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gi">+%package -n python2-%{srcname}</span>
+<span class="gi">+Summary:        %{summary}</span>
+<span class="gi">+Requires:       python2-some-module</span>
+<span class="gi">+Requires:       python2-other-module</span>
+<span class="gi">+%{?python_provide:%python_provide python2-%{srcname}}</span>
+<span class="gi">+</span>
+<span class="gi">+%description -n python2-%{srcname}</span>
+ A Python module which provides a convenient example.
+</pre></div>
+</div>
+<p>Note, that in case of the last naming scheme example in the <a class="reference internal" href="#common-naming-scheme-violations">table above</a>, when you rename the binary RPM from <code class="docutils literal"><span class="pre">&lt;srcname&gt;</span></code> to <code class="docutils literal"><span class="pre">python2-&lt;srcname&gt;</span></code>, the <a class="reference external" href="modules.html#python-provide">%python_provide</a> macro will not provide the old name <code class="docutils literal"><span class="pre">&lt;srcname&gt;</span></code>. To keep the upgrade path clean you will have to provide it and obsolete the old verision manually. You may place the tags right after the <a class="reference external" href="modules.html#python-provide">%python_provide</a> macro:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span>%{?python_provide:%python_provide python2-<span class="kc">%{srcname}</span>}
+<span class="hll"><span class="gh">Provides</span><span class="p">:</span>   <span class="kc">%{srcname}</span> = <span class="kc">%{version}</span>-<span class="kc">%{release}</span>
+</span><span class="hll"><span class="gh">Obsoletes</span><span class="p">:</span>  <span class="kc">%{srcname}</span> &lt; current_version-current_release
+</span></pre></div>
+</div>
+<p>In the Obsoletes tag, <code class="docutils literal"><span class="pre">current_version</span></code> and <code class="docutils literal"><span class="pre">current_release</span></code> are the first version and release when the new naming scheme was used.</p>
+</div>
+<div class="section" id="use-the-python-provide-macro-in-the-python-3-subpackage">
+<h4>Use the <code class="docutils literal"><span class="pre">%python_provide</span></code> macro in the Python 3 subpackage<a class="headerlink" href="#use-the-python-provide-macro-in-the-python-3-subpackage" title="Permalink to this headline">¶</a></h4>
+<p>Check your Python 3 subpackage (if you build any), and make sure you are using the <a class="reference external" href="modules.html#python-provide">%python_provide</a> macro to handle provides:</p>
+<div class="highlight-spec"><div class="highlight"><pre><span></span><span class="nd">%package</span> -n python3-%{srcname}
+<span class="gh">Summary</span><span class="p">:</span>        <span class="kc">%{summary}</span>
+<span class="gh">Requires</span><span class="p">:</span>       python3-some-module
+<span class="gh">Requires</span><span class="p">:</span>       python3-other-module
+<span class="hll">%{?python_provide:%python_provide python3-<span class="kc">%{srcname}</span>}
+</span>
+<span class="nd">%description</span> -n python3-%{srcname}
+A Python module which provides a convenient example.
+</pre></div>
+</div>
+</div>
+<div class="section" id="rename-the-files-section">
+<h4>Rename the <code class="docutils literal"><span class="pre">%files</span></code> section<a class="headerlink" href="#rename-the-files-section" title="Permalink to this headline">¶</a></h4>
+<p>To assign the <code class="docutils literal"><span class="pre">%files</span></code> section to the Python 2 subpackage, add the subpackage name with the versioned prefix after the <code class="docutils literal"><span class="pre">%files</span></code> macro. Make sure to use the new versioned macros <code class="docutils literal"><span class="pre">%{python2_sitelib}</span></code>, <code class="docutils literal"><span class="pre">%{python2_sitearch}</span></code>, and <code class="docutils literal"><span class="pre">%{python2_version}</span></code> as well:</p>
+<div class="highlight-udiff"><div class="highlight"><pre><span></span><span class="gd">-%files</span>
+<span class="gi">+# Note that there is no %%files section for the unversioned Python package</span>
+<span class="gi">+%files -n python2-%{srcname}</span>
+ %license COPYING
+ %doc README
+<span class="gd">-%{python_sitelib}/*</span>
+<span class="gi">+%{python2_sitelib}/*</span>
+</pre></div>
+</div>
+<p>At this point you should be done. Don&#8217;t forget to bump the release tag and add a changelog entry indicating you&#8217;ve updated the package to use the new naming scheme.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tools.html" class="btn btn-neutral" title="Tools for programming in Python" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Red Hat, Inc., CC BY-SA, examples CC0.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
